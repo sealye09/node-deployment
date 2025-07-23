@@ -1,0 +1,23 @@
+{
+  "name": "node-deployment",
+  "author": "Seal",
+  "private": false,
+  "description": "Nodejs deployment scripts for spa frontend.",
+  "version": "1.0.0",
+  "main": "deploy.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "format": "pnpm exec biome format --write",
+    "lint": "pnpm exec biome lint --write"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "commander": "^14.0.0",
+    "dotenv": "^17.2.0",
+    "pathe": "^2.0.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.2"
+  }
+}

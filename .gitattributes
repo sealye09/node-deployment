@@ -1,0 +1,13 @@
+# 设置默认行为，如果core.autocrlf未设置
+* text=auto eol=lf
+
+# 文本文件强制使用 LF
+*.{js,jsx,ts,tsx,vue,svelte,astro} text eol=lf
+*.{css,less,scss,sass,styl,postcss,pcss} text eol=lf
+*.{json,html,md,yml,yaml,xml} text eol=lf
+*.{svg} text eol=lf
+*.{mdx} text eol=lf
+*.{txt} text eol=lf
+
+# 二进制文件不修改
+*.{ico,png,jpg,jpeg,gif,webp,eot,ttf,woff,woff2,pdf,zip} binary
