@@ -379,7 +379,6 @@ dist.zip
 /stats.json
 /stats.html
 
-# 部署环境变量文件
-deploy/*.env.*
-!deploy/.env.local.template
-!deploy/.env.template.local
+# 部署环境变量文件、
+!.env.local.template
+!.env.template.local

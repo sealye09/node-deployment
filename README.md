@@ -18,6 +18,7 @@ Create the following files in the `/deploy` directory:
 ```
 SERVER=username@test-server-ip
 REMOTE_DIR=/path/to/your/test/deployment
+BUILD_COMMAND=npm run build:test
 ```
 
 **`deploy/.env.production.local`**
@@ -25,6 +26,7 @@ REMOTE_DIR=/path/to/your/test/deployment
 ```
 SERVER=username@production-server-ip
 REMOTE_DIR=/path/to/your/production/deployment
+BUILD_COMMAND=npm run build:prod
 ```
 
 ### Usage
@@ -34,13 +36,13 @@ The script is a Node.js script. You can run it from the project root directory.
 #### Deploy to Test Environment
 
 ```bash
-node deploy/deploy.js --mode=test
+node deploy/deploy.js --mode test
 ```
 
 #### Deploy to Production Environment
 
 ```bash
-node deploy/deploy.js --mode=production
+node deploy/deploy.js --mode production
 ```
 
 ### Deployment Logic
@@ -57,4 +59,4 @@ node deploy/deploy.js --mode=production
     - Unzips the new application files.
     - Removes the uploaded zip file.
     - Sets the correct file permissions (`chmod -R 755 .`).
-8.  **Cleanup**: The local zip file is deleted. 
+8.  **Cleanup**: The local zip file is deleted.

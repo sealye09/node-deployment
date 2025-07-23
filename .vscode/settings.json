@@ -3,6 +3,7 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
     "source.organizeImports": "explicit",
-    "source.fixAll.sortJSON": "never",
-  }
+    "source.fixAll.sortJSON": "never"
+  },
+  "cSpell.words": ["ignorecase"]
 }
