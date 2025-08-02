@@ -1,15 +1,16 @@
 import { execSync } from "node:child_process";
+import process from "node:process";
 import readline from "node:readline";
 
 export const log = (message, color = "reset") => {
   const colors = {
-    reset: "\x1b[0m",
-    green: "\x1b[32m",
-    yellow: "\x1b[33m",
-    red: "\x1b[31m",
-    cyan: "\x1b[36m",
-    blue: "\x1b[34m",
-    magenta: "\x1b[35m",
+    reset: "\x1B[0m",
+    green: "\x1B[32m",
+    yellow: "\x1B[33m",
+    red: "\x1B[31m",
+    cyan: "\x1B[36m",
+    blue: "\x1B[34m",
+    magenta: "\x1B[35m",
   };
   console.log(`${colors[color]}${message}${colors.reset}`);
 };
@@ -59,4 +60,46 @@ export const showProgress = (message, current, total) => {
   if (current === total) {
     process.stdout.write("\n");
   }
+};
+
+// 安全验证函数
+export const validateInput = (value, type) => {
+  if (!value || typeof value !== "string") return false;
+
+  switch (type) {
+    case "server":
+      // 验证服务器地址格式
+      return (
+        /^[\w.-]+@[\w.-]+\.[a-z]{2,}$/i.test(value) ||
+        /^[\w.-]+@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(value) ||
+        /^[\w.-]+$/.test(value)
+      );
+    case "path":
+      // 验证路径安全性，防止路径遍历
+      return (
+        !value.includes("..") &&
+        !value.includes("~") &&
+        !value.startsWith("/etc") &&
+        !value.startsWith("/root") &&
+        !value.startsWith("/var/log") &&
+        !value.includes(";") &&
+        !value.includes("|") &&
+        !value.includes("&") &&
+        !value.includes("`") &&
+        !value.includes("$(")
+      );
+    case "number": {
+      // 验证数字
+      const num = Number.parseInt(value);
+      return !Number.isNaN(num) && num > 0 && num <= 100;
+    }
+    default:
+      return true;
+  }
+};
+
+// 转义 shell 参数
+export const escapeShellArg = (arg) => {
+  if (!arg) return '""';
+  return `"${arg.replace(/"/g, '\\"')}"`;
 };
