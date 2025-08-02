@@ -1,62 +1,88 @@
-## Deployment Script
+# node-deployment
 
-This directory contains the scripts for deploying the application to `test` and `production` environments.
+## 简介
 
-### Prerequisites
+本项目为一键部署脚本，支持将本地构建产物自动上传并部署到远程服务器，支持备份、自动清理、环境区分等功能。适用于 Node.js 前端/后端项目的自动化部署。
 
-1.  **Node.js**: Node.js version 22 is required. Please use a version manager like `nvm` or `fnm` to ensure you are using the correct version.
-2.  **Environment Files**: You need to create `.env.test.local` and `.env.production.local` files in the `deploy` directory. These files are not checked into version control.
-3.  **SSH Access**: You must have passwordless SSH access (using SSH keys) to the target server.
-4.  **Dependencies**: Run `npm install` in the project root to install the required deployment script dependencies (`dotenv`, `archiver`).
+---
 
-### Environment File Setup
+## 依赖环境
 
-Create the following files in the `/deploy` directory:
+- Node.js 18+
+- ssh、scp、unzip（本地需安装并配置好环境变量）
+- 远程服务器需支持 ssh 登录
 
-**`deploy/.env.test.local`**
+---
 
-```
-SERVER=username@test-server-ip
-REMOTE_DIR=/path/to/your/test/deployment
-BUILD_COMMAND=npm run build:test
-```
+## 快速开始
 
-**`deploy/.env.production.local`**
+1. **安装依赖**
 
-```
-SERVER=username@production-server-ip
-REMOTE_DIR=/path/to/your/production/deployment
-BUILD_COMMAND=npm run build:prod
-```
+   ```bash
+   pnpm install
+   # 或
+   npm install
+   ```
 
-### Usage
+2. **配置环境变量**
 
-The script is a Node.js script. You can run it from the project root directory.
+   - 复制 `.env.template.local` 为 `.env.test.local`、`.env.production.local` 或 `.env.local`，并根据实际环境填写变量。
 
-#### Deploy to Test Environment
+     ```bash
+     cp .env.template.local .env.test.local
+     cp .env.template.local .env.production.local
+     ```
 
-```bash
-node deploy/deploy.js --mode test
-```
+   - 主要变量说明：
 
-#### Deploy to Production Environment
+     | 变量名        | 说明                                                      |
+     | ------------- | --------------------------------------------------------- |
+     | SERVER        | 远程服务器 SSH 连接信息（如 user@host 或 user@ip）        |
+     | REMOTE_DIR    | 远程部署目录（绝对路径，需有写权限）                      |
+     | BUILD_COMMAND | 本地构建命令（如 `npm run build`、`pnpm run build:prod`） |
+     | DIST_PATH     | 构建产物目录（相对项目根目录，通常为 dist 或 build）      |
+     | BACKUP_COUNT  | 远程备份保留数量（1-100，超出自动删除最旧备份）           |
 
-```bash
-node deploy/deploy.js --mode production
-```
+   - 详细变量说明见 `.env.template.local` 文件注释。
 
-### Deployment Logic
+3. **执行部署**
 
-1.  **Mode Selection**: The script accepts a `--mode` flag which can be `test` or `production`. If not provided, it will exit.
-2.  **Environment Check**: It checks if the correct Node.js version (v22) is being used and exits if not.
-3.  **Build**: It runs the appropriate build command (`npm run build:test` or `npm run build:prod`).
-4.  **Load Environment**: It loads the `SERVER` and `REMOTE_DIR` variables from the corresponding `.env` file (`deploy/.env.test.local` or `deploy/.env.production.local`).
-5.  **Compress**: The build output from the `dist/` folder is compressed into a zip file in the system's temporary directory.
-6.  **Upload**: The zip file is securely copied (`scp`) to the remote server's remote directory.
-7.  **Remote Execution**: On the server, the script performs the following actions via SSH:
-    - Creates the remote directory if it doesn't exist.
-    - Cleans the directory of any old files.
-    - Unzips the new application files.
-    - Removes the uploaded zip file.
-    - Sets the correct file permissions (`chmod -R 755 .`).
-8.  **Cleanup**: The local zip file is deleted.
+   ```bash
+   pnpm deploy --mode test
+   # 或
+   node index.js --mode production
+   ```
+
+   可选参数：
+
+   - `--mode <mode>` 指定部署环境（test 或 production）
+   - `--skip-build` 跳过本地构建步骤，仅部署
+   - `--no-backup` 不创建远程备份
+   - `--force` 跳过所有确认，强制执行
+
+---
+
+## 主要特性
+
+- 支持多环境部署（test/production）
+- 自动本地构建、压缩、上传、远程解压
+- 远程备份与备份数量自动清理
+- 环境变量安全校验
+- 详细日志与进度提示
+
+---
+
+## 注意事项
+
+- 远程目录需提前创建并赋予写权限
+- 推荐使用权限受限的 Linux 用户进行部署，避免使用 root
+- 本地需安装 ssh、scp、unzip 等命令行工具
+- 所有环境变量均为必填项，否则部署会报错
+
+---
+
+## 参考
+
+- `.env.template.local` 文件内含详细变量说明与使用建议
+- 如需自定义构建产物目录，修改 `DIST_PATH`
+- 备份文件将存放于 `$REMOTE_DIR/__backups__` 目录下
